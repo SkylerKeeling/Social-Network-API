@@ -10,32 +10,16 @@ module.exports = {
     }
   },
 
-  async getOneUser(req, res) {
-    try {
-      const user = await User.findOne(
-        {_id: req.params.userId},
-        {
-          $addToSet: {thought, friends},
-        }
-      ).select("-__v")
-
-      if (!user) {
-        return res.status(404).json({message: "No user found"})
-      }
-
-      res.json(user)
-    } catch (err) {
-      res.status(500).json(err)
-    }
+  getOneUser(req, res) {
+    User.findById(req.params.userId)
+      .then(userData => res.json(userData))
+      .catch(err => res.status(500).json(err))
   },
 
-  async createUser(req, res) {
-    try {
-      const User = await User.create(req.body)
-      res.json(User)
-    } catch (err) {
-      return res.status(500).json(err)
-    }
+  createUser(req, res) {
+    User.create(req.body)
+      .then(dbUserData => res.json(dbUserData))
+      .catch(err => res.status(500).json(err))
   },
 
   async updateUser(req, res) {
@@ -79,7 +63,7 @@ module.exports = {
       const user = await User.findOneAndUpdate(
         {_id: req.params.userId},
         {$addToSet: {friends: req.params.friendId}},
-        {runValidators: true, new: true}
+        {new: true}
       )
       res.json({message: "Friend added!"})
     } catch (err) {
